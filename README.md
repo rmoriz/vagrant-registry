@@ -12,7 +12,7 @@ live.
 
 1. [Design and contract](docs/superpowers/specs/2026-11-13-vagrant-registry-design.md)
    — what Vagrant actually calls, the JSON contract, the shared YAML source
-   format, validation rules, and the three options with trade-offs.
+   format, validation rules, and the four options with trade-offs.
 2. One implementation plan:
    - [Option A — static catalogs](docs/superpowers/plans/2026-11-13-option-a-static-catalogs.md)
      (S3 + CloudFront for `VAGRANT_SERVER_URL`; GitHub Pages for direct
@@ -20,7 +20,9 @@ live.
    - [Option B — file-backed service](docs/superpowers/plans/2026-11-13-option-b-file-backed-service.md)
      (small Go service, YAML files on disk, no database)
    - [Option C — database registry](docs/superpowers/plans/2026-11-13-option-c-database-registry.md)
-     (SQLite, admin API, minimal admin UI)
+     (Go service, SQLite, admin API, minimal admin UI)
+   - [Option D — Cloudflare Workers + D1](docs/superpowers/plans/2026-11-13-option-d-cloudflare-rust.md)
+     (Rust Worker, D1, same admin API/UI and YAML import, no server to run)
 
 ## Which option?
 
@@ -29,22 +31,25 @@ live.
 | Catalogs change by pull request; you want zero application runtime; a few minutes of publish latency is fine | **A** |
 | CI should publish immediately without an S3/Pages deploy step; you are fine running one small container | **B** |
 | Non-engineers edit boxes in a browser, or you need queryable records and an admin API | **C** |
+| You want C’s admin API/UI and YAML import, but do not want to operate a server or database; Cloudflare Workers + D1 is acceptable | **D** |
 
 Recommendation for the stated goal (“registry only, no hosting”): **A**.
 It has the smallest operational surface and is fully compatible with
 `VAGRANT_SERVER_URL` when deployed to S3 + CloudFront. Choose B when
-publishing must be decoupled from static deployment, and C only when a UI
-or many editors justify a database.
+publishing must be decoupled from static deployment, C when a UI or many
+editors justify a database, and D when you want C’s feature set as a
+managed serverless deployment.
 
 ## Important
 
 These are **alternative** plans, not a sequence. Pick one. If you want to
 compare them side by side, run each in its own branch or worktree; do not
-implement all three in the same working tree.
+implement more than one in the same working tree.
 
-All three plans use Go 1.22+ and share the same catalog schema and
-validation rules from the design doc. A and B use the same YAML files;
-C can import them and exposes the same JSON contract through an API.
+Options A/B/C use Go 1.22+; Option D uses Rust 1.91 on Cloudflare Workers.
+All four share the same catalog schema and validation rules from the design
+doc. A and B use the same YAML files; C and D import them and expose the
+same JSON contract through an API.
 
 ## Repository layout the plans produce
 
@@ -57,7 +62,8 @@ C can import them and exposes the same JSON contract through an API.
 │   │   └── plans/
 │   │       ├── 2026-11-13-option-a-static-catalogs.md
 │   │       ├── 2026-11-13-option-b-file-backed-service.md
-│   │       └── 2026-11-13-option-c-database-registry.md
+│   │       ├── 2026-11-13-option-c-database-registry.md
+│   │       └── 2026-11-13-option-d-cloudflare-rust.md
 │   └── ... deployment runbooks created by the chosen plan
 └── (application files created by the chosen plan)
 ```

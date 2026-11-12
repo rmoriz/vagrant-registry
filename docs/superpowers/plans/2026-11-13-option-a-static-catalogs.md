@@ -49,7 +49,7 @@
 - [ ] **Step 1: Initialize the module and ignore generated files**
 
 ```bash
-cd /Users/rmoriz/sync/Projekte/vagrant-registry
+cd /path/to/vagrant-registry
 git init  # only if not already a repository
 go mod init github.com/rmoriz/vagrant-registry
 printf 'public/\nbin/\n.DS_Store\n' > .gitignore

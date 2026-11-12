@@ -55,7 +55,7 @@
 - [ ] **Step 1: Initialize the module**
 
 ```bash
-cd /Users/rmoriz/sync/Projekte/vagrant-registry
+cd /path/to/vagrant-registry
 git init  # only if not already a repository
 go mod init github.com/rmoriz/vagrant-registry
 printf 'bin/\n*.db\n*.db-shm\n*.db-wal\n.DS_Store\n' > .gitignore

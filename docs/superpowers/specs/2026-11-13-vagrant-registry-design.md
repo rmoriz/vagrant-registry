@@ -216,7 +216,10 @@ These rules decide whether a correct-looking catalog still fails:
 ## 3. Source format
 
 Options A and B use one YAML file per box. Option C accepts the equivalent
-JSON through its admin API and can import the same YAML.
+JSON through its admin API and can import the same YAML. Option D accepts the
+same JSON and YAML through a Worker; its YAML importer requires versions to be
+quoted strings because Rust’s YAML parser cannot preserve an unquoted numeric
+scalar without risking silent normalization.
 
 Layout:
 
@@ -275,11 +278,13 @@ Rules:
 
 ---
 
-## 4. Shared Go package
+## 4. Shared catalog model
 
-All plans use Go 1.22+ so the standard library’s method-aware `ServeMux` is
-available. A and B share this package; C uses the same types and validation
-but persists them in SQLite.
+All Go plans use Go 1.22+ so the standard library’s method-aware `ServeMux`
+is available. A and B share this package; C uses the same types and validation
+but persists them in SQLite. D ports the same model to a pure Rust
+`vagrant-registry-core` crate and keeps the same field names, validation
+rules, and JSON rendering.
 
 ```go
 package catalog
@@ -412,18 +417,37 @@ audit-friendly `created_at`/`updated_at`.
 Cons: database, migrations, backups, auth, CSRF, and more code. SQLite is
 single-node; horizontal scaling is out of scope.
 
+### Option D — Cloudflare Workers + D1
+
+The same feature set as C, implemented as a Rust Worker with D1 as the
+database. Public routes render the same JSON. Admin routes provide the
+full-document `PUT`, individual version endpoints, YAML import, and a
+server-rendered admin UI.
+
+- Rust 1.91, `worker` 0.9, `wasm32-unknown-unknown`.
+- D1 replaces SQLite; `D1Database::batch()` is the atomic full-document write.
+- `REGISTRY_ADMIN_TOKEN` is a Worker secret; the UI uses Basic auth and a
+  double-submit CSRF cookie.
+- No server, container, or database host to operate; deployment is
+  `wrangler deploy`.
+
+Pros: immediate publishing, managed runtime and database, the same API/UI as
+C, no host to patch, global edge presence.
+Cons: Cloudflare lock-in, D1 limits and latency, Wrangler tooling, Rust/WASM
+build chain, and a stricter YAML importer that requires quoted versions.
+
 ### Comparison
 
-| | A static | B file service | C database |
-|---|---|---|---|
-| Authoring | Git YAML | Git YAML copied to host | API or UI |
-| Publish latency | CI/deploy minutes | seconds (reload) | immediate |
-| Runtime | none (CDN only) | one small service | service + SQLite |
-| Ops burden | lowest | low | medium |
-| Multi-editor | via Git | via Git | yes |
-| Query/audit | Git history | Git history | DB timestamps |
-| Failure mode | stale deploy | bad reload keeps last good | DB/migration issues |
-| Best for | small, slow-moving catalog | CI publish without redeploy | UI/many maintainers |
+| | A static | B file service | C database | D Workers + D1 |
+|---|---|---|---|---|
+| Authoring | Git YAML | Git YAML copied to host | API or UI | API, UI, or YAML import |
+| Publish latency | CI/deploy minutes | seconds (reload) | immediate | immediate |
+| Runtime | none (CDN only) | one small service | service + SQLite | Cloudflare Worker + D1 |
+| Ops burden | lowest | low | medium | low (managed), but vendor-bound |
+| Multi-editor | via Git | via Git | yes | yes |
+| Query/audit | Git history | Git history | DB timestamps | D1 timestamps + Time Travel |
+| Failure mode | stale deploy | bad reload keeps last good | DB/migration issues | D1 limits, deploy/config errors |
+| Best for | small, slow-moving catalog | CI publish without redeploy | UI/many maintainers | C’s features without running servers |
 
 ### Recommendation
 
@@ -434,15 +458,19 @@ operations surface, and exactly satisfies `VAGRANT_SERVER_URL`.
 Choose **B** when CI must publish a new version without waiting for a
 static-site deploy, or when catalogs live outside the registry repository.
 Choose **C** only when a browser UI or many non-engineer editors are a real
-requirement; otherwise the database and auth surface are unjustified.
+requirement; otherwise the database and auth surface are unjustified. Choose
+**D** instead of C when you want the same API/UI but prefer a managed
+serverless runtime and D1 over operating a service and database.
 
 ### Migration path
 
 - A → B: point B at the same `boxes/` directory; switch DNS/`VAGRANT_SERVER_URL`.
 - B → C: import the YAML with `PUT /api/v1/admin/boxes/{org}/{box}` for each
   catalog; keep the same public routes and contract.
+- C → D: export the catalogs as JSON, deploy the Worker, apply the D1
+  migrations, and PUT each catalog or use the YAML import endpoint.
 - All options share the same validation rules, so a catalog that passes A
-  also passes B/C.
+  also passes B/C/D. D is stricter only about quoting YAML versions.
 
 ---
 
@@ -455,31 +483,37 @@ requirement; otherwise the database and auth surface are unjustified.
 - **Public catalogs are public.** Do not put private artifact URLs in a
   public catalog. If the catalog is private, put the whole registry behind
   auth; provider URLs must be independently accessible.
-- **Admin surface (C only).** Bearer token for API, Basic auth for UI,
+- **Admin surface (C and D).** Bearer token for API, Basic auth for UI,
   CSRF protection on UI POSTs, `SameSite=Strict` cookies, body-size limits,
   and constant-time token comparison. If `REGISTRY_ADMIN_TOKEN` is unset,
   admin routes return 404.
 - **Path traversal.** Validate names before using them in filesystem paths.
 - **Caching.** Use a short TTL (`public, max-age=60`) or no-cache for the
   catalog. Vagrant itself caches outdated checks client-side for one hour.
-- **Observability.** Structured logs (`slog`), request method/path/status,
-  reload success/failure (B), migration and admin actions (C). Health
-  endpoint must not require auth but must not expose secrets.
-- **Backups (C).** SQLite WAL mode; back up with `sqlite3 registry.db
-  ".backup backup.db"` or `VACUUM INTO` on a schedule. Document restore.
+- **Observability.** Structured logs (`slog` for Go, `console_*` plus
+  Workers observability for D), request method/path/status, reload
+  success/failure (B), migration and admin actions (C/D). Health endpoint
+  must not require auth but must not expose secrets.
+- **Backups (C/D).** SQLite WAL mode; back up with `sqlite3 registry.db
+  ".backup backup.db"` or `VACUUM INTO` on a schedule. For D, use
+  `wrangler d1 export` and D1 Time Travel. Document restore and test it.
 
 ---
 
 ## 7. Decisions taken in this design
 
-- Go 1.22+ for all runtime/generator code; standard library HTTP and
-  templates; `gopkg.in/yaml.v3` for YAML; `modernc.org/sqlite` for C.
+- Go 1.22+ for A/B/C; standard library HTTP and templates;
+  `gopkg.in/yaml.v3` for YAML; `modernc.org/sqlite` for C.
+- Option D uses Rust 1.91, `worker` 0.9, `serde_yaml_ng`, and D1; the pure
+  catalog/validation/render code lives in `crates/core`.
 - One YAML file per box; path must match `name`.
 - Public contract is the two routes only; no `/api/v1` public API.
-- Options A and B use the same catalog package and validation.
-- Option C’s full-document `PUT` is the canonical write path; individual
+- Options A and B use the same catalog package and validation; C and D
+  reproduce the same rules in their own stacks.
+- The full-document `PUT` is the canonical write path for C/D; individual
   version endpoints and the UI are conveniences on top of it.
-- Version strings are quoted in docs and preserved from YAML scalar text.
+- Version strings are quoted in docs. A/B/C preserve YAML scalar text; D
+  rejects unquoted numeric versions rather than risk silent normalization.
 - `default_architecture` is emitted as `false` for non-default,
   architecture-aware providers to avoid Vagrant’s legacy fallback.
 
@@ -496,7 +530,7 @@ the behavior.
 4. Removed boxes/versions remaining in a previously generated output tree.
 5. Static upload without `Content-Type: application/json` on `HEAD`.
 6. Invalid reload replacing a known-good snapshot (B).
-7. `HEAD` returning a body or the wrong `Content-Length` (B/C).
-8. Path traversal in a URL segment (B/C).
-9. Non-atomic admin `PUT` leaving partial versions (C).
-10. Admin auth/CSRF bypass (C).
+7. `HEAD` returning a body or the wrong `Content-Length` (B/C/D).
+8. Path traversal in a URL segment (B/C/D).
+9. Non-atomic admin `PUT` leaving partial versions (C/D).
+10. Admin auth/CSRF bypass (C/D).
