@@ -33,8 +33,9 @@ resolve percent-encoded names such as `/acme%2Fbase`.
    `data/example/toolbox.json` may only declare `"name": "example/toolbox"`.
    A mismatch fails the build, as does a duplicate name.
 
-2. Edit the document. Replace the description, versions, providers, URLs, and
-   checksums. Point every `url` at the real artifact.
+2. Edit the document, including `name`: a copied document still carries the old
+   name until you change it. Replace the description, versions, providers,
+   URLs, and checksums. Point every `url` at the real artifact.
 
 3. Validate the whole tree:
 
@@ -51,7 +52,7 @@ resolve percent-encoded names such as `/acme%2Fbase`.
 
 ## Document shape
 
-Documents are strict JSON-shaped like this, and every field is spelled out
+Documents are strict JSON, shaped like this, and every field is spelled out
 below:
 
 ```json
@@ -97,7 +98,8 @@ below:
 | `versions` | yes | at least one; version strings unique |
 | `version` | yes | a `Gem::Version`: `^[0-9]+(\.[0-9A-Za-z]+)*$` |
 | `providers` | yes | one to 100 per version |
-| provider `name` | yes | `^[a-z][a-z0-9_]*$`, and must match the provider's box format |
+| provider `name` | yes | `^[a-z][a-z0-9_]*$`; matching the provider's box format (for example `virtualbox` or `libvirt`) is a review convention, not machine-checked |
+| provider identity | yes | `(name, architecture)` unique within a version; an empty architecture is its own key |
 | provider `url` | yes | absolute `http`/`https` URL with a host and no `user:pass@`; may be presigned |
 | `checksum` / `checksum_type` | no | both or neither; `md5`, `sha1`, `sha256`, `sha384`, `sha512` with a hex digest of the matching length |
 | `architecture` | no | `^[A-Za-z0-9_]+$`; `unknown` is allowed |

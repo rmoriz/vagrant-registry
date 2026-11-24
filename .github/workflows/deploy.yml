@@ -25,7 +25,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -68,7 +68,7 @@ jobs:
     if: github.ref == 'refs/heads/staging'
     runs-on: ubuntu-latest
     environment: staging
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - name: Check out
         uses: actions/checkout@v4
