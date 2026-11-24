@@ -1,6 +1,6 @@
-# Build stage. bookworm (glibc 2.36) matches the distroless cc-debian12 runtime;
-# trixie's glibc is too new for it.
-FROM rust:1.91-slim-bookworm AS builder
+# Both stages are Debian 13 (trixie) so the glibc the binary links against is the
+# one the runtime ships; never build on a newer Debian than the final image.
+FROM rust:1.91-slim-trixie AS builder
 
 WORKDIR /src
 
@@ -11,7 +11,7 @@ COPY data ./data
 
 RUN cargo build --release -p vagrant-registry-server
 
-FROM gcr.io/distroless/cc-debian12:nonroot
+FROM gcr.io/distroless/cc-debian13:nonroot
 
 COPY --from=builder --chown=nonroot:nonroot /src/target/release/vagrant-registry-server /app/vagrant-registry-server
 
