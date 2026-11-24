@@ -9,12 +9,12 @@ const METHOD_NOT_ALLOWED: &str = "method not allowed";
 static CATALOG_HEADERS: [(&str, &str); 3] = [
     ("content-type", "application/json"),
     ("x-content-type-options", "nosniff"),
-    // Catalogs are baked into the deployment, so a URL's bytes cannot change
-    // until a new one ships. Fresh for a day, then served stale for up to a
-    // week while revalidating, or for a week if the origin is unreachable.
+    // Catalogs are baked into the deployment and the shared cache is keyed by
+    // Worker version, so a deploy starts cold. Buckets hold it for a year;
+    // browsers revalidate, which the edge answers without running the Worker.
     (
         "cache-control",
-        "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800",
+        "public, max-age=0, s-maxage=31536000, stale-while-revalidate=604800, stale-if-error=604800",
     ),
 ];
 static HTML_HEADERS: [(&str, &str); 3] = [
@@ -417,7 +417,7 @@ mod tests {
                 assert_eq!(
                     header(&reply, "cache-control"),
                     Some(
-                        "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800"
+                        "public, max-age=0, s-maxage=31536000, stale-while-revalidate=604800, stale-if-error=604800"
                     ),
                     "{method} {path}"
                 );

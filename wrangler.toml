@@ -5,6 +5,13 @@ compatibility_date = "2026-11-24"
 [build]
 command = "sh -c 'cd crates/worker && worker-build --release -d ../../build'"
 
+# Cloudflare answers from its edge cache without running the worker. The cache
+# key includes the worker version by default, so a deploy starts cold; that is
+# what makes a year-long TTL safe. The handler decides via Cache-Control which
+# responses are cacheable, which is catalogs only.
+[cache]
+enabled = true
+
 [observability]
 enabled = true
 
@@ -13,3 +20,6 @@ name = "vagrant-registry-staging"
 
 [env.staging.build]
 command = "sh -c 'cd crates/worker && worker-build --release -d ../../build'"
+
+[env.staging.cache]
+enabled = true

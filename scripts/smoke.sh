@@ -87,4 +87,19 @@ curl -sSI -X POST "$base/acme/base" | tr -d '\r' | grep -qi '^allow: GET, HEAD$'
   fail 'POST /acme/base: missing allow: GET, HEAD'
 printf 'ok: 405 on POST\n'
 
+# Where a shared cache sits in front (production Workers Cache), a second
+# request for the same key must be a hit and must not re-run the handler.
+# Local `wrangler dev` has no edge cache and reports no status, so this is
+# skipped there.
+probe="$base/acme/base?cache-probe=$$"
+first=$(curl -sS -o /dev/null -D - "$probe" | tr -d '\r' | sed -n 's/^cf-cache-status: //Ip')
+if [ -n "$first" ]; then
+  [ "$first" = MISS ] || fail "cache probe: first request want MISS, got $first"
+  second=$(curl -sS -o /dev/null -D - "$probe" | tr -d '\r' | sed -n 's/^cf-cache-status: //Ip')
+  [ "$second" = HIT ] || fail "cache probe: second request want HIT, got ${second:-none}"
+  printf 'ok: shared cache\n'
+else
+  printf 'ok: shared cache (skipped, no cf-cache-status)\n'
+fi
+
 printf 'ok: smoke passed\n'

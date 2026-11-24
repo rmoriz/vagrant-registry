@@ -44,6 +44,34 @@ Worker. Staging can hold experimental catalogs; production only changes on
 
 Both Workers keep workers.dev enabled. No zone or DNS record is required.
 
+### Cache
+
+`[cache] enabled = true` is set for both Workers, so Cloudflare answers a
+cacheable request from its edge without running the Worker. The handler marks
+only catalog `GET`/`HEAD` cacheable, and only for shared caches
+(`s-maxage=31536000`); browsers revalidate every time (`max-age=0`).
+
+Invalidation is implicit: the cache key includes the Worker version, so each
+deploy starts cold. That is why the TTL can be a year — and why a rollback also
+starts cold. Verify after a deploy; the second request for the same path must
+report a hit:
+
+```bash
+host=https://vagrant-registry.<account>.workers.dev
+curl -sS -o /dev/null -D - "$host/acme/base?probe=1" | grep -i cf-cache-status  # MISS
+curl -sS -o /dev/null -D - "$host/acme/base?probe=1" | grep -i cf-cache-status  # HIT
+```
+
+`scripts/smoke.sh` makes that check whenever `cf-cache-status` is present and
+skips it locally, where `wrangler dev` has no edge cache.
+
+If you set `cache.cross_version_cache = true` for a warmer cache across
+deploys, a deploy no longer invalidates anything and you must purge yourself:
+either call `ctx.cache.purge({ purgeEverything: true })` from an endpoint the
+deploy job hits, or tag responses with the version metadata binding and purge
+by tag. Zone-level purges — dashboard, API, Terraform — never touch a Worker's
+cache.
+
 ### Rollback
 
 `wrangler rollback` redeploys the previous version of the Worker in one step:

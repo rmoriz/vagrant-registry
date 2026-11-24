@@ -199,19 +199,24 @@ smokes the container image.
 A catalog `GET` or `HEAD` is served with
 
 ```text
-Cache-Control: public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800
+Cache-Control: public, max-age=0, s-maxage=31536000, stale-while-revalidate=604800, stale-if-error=604800
 ```
 
-Index, health, and error responses are `no-store`. The reasoning: a catalog is
-compiled into the deployment, so the bytes behind one URL cannot change until
-a new deployment ships — but the URL itself is not versioned, so caches must
-still have a bound. A day of freshness keeps repeat requests off the origin;
-after that the stale copy is served while a background request revalidates, and
-for a week if the origin errors out.
+The two lifetimes differ on purpose. `s-maxage` applies to the shared cache in
+front — Cloudflare's Workers Cache — and keeps a catalog there for a year,
+because a catalog is compiled into the deployment and cannot change until a new
+one ships. `max-age=0` tells browsers to revalidate, so no user holds a stale
+copy; the edge answers that revalidation without running the Worker.
 
-Practical consequences: a merge, or a host migration, can take up to a day to
-reach a warm cache, and a cache holding a fresh entry will not revalidate on
-its own. Vagrant's own requests bypass HTTP caches (it fetches through curl on
-`box add`/`box update`), so this affects browsers and proxies, not `vagrant
-box update` itself. Vagrant does cache outdated checks client-side for an hour,
-so `vagrant box outdated` is not instant either.
+Index, health, and error responses are `no-store`, so a box added later is never
+hidden behind a cached `404`.
+
+Cloudflare keys the cache by request path and **Worker version**, so a deploy
+starts with a cold cache by itself and nothing has to be purged. The trade-off
+is the reverse: a rollback also starts cold, and only a redeploy brings back a
+warm cache. See `docs/deployment.md` before changing that behavior.
+
+Vagrant's own requests bypass HTTP caches — it fetches through curl on
+`box add` and `box update` — so this affects browsers and proxies, not the
+Vagrant client. Vagrant separately caches outdated checks client-side for an
+hour, so `vagrant box outdated` is not instant either.

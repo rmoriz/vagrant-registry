@@ -161,8 +161,9 @@ fails the build and the merge gate before anything ships.
 ## Limits
 
 - 1 MiB per rendered catalog document, 16 MiB in total; both are build errors.
-- Catalog responses are cacheable for a day
-  (`public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800`).
+- Catalog responses are cacheable by the shared cache for a year
+  (`public, max-age=0, s-maxage=31536000`); browsers revalidate. A deploy
+  starts a cold cache because the Worker version is part of the cache key.
 - Documents are strict: unknown fields, invalid versions, and name/path
   mismatches fail the build.
 
