@@ -16,7 +16,7 @@ jobs:
   test:
     name: Format, lint, test, and build WASM
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -124,6 +124,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: "1.91"
+          targets: wasm32-unknown-unknown
 
       - name: Cache Rust artifacts
         uses: Swatinem/rust-cache@v2
@@ -164,8 +165,11 @@ jobs:
       - name: Stop the worker and show its log
         if: always()
         run: |
+          # npx may not forward the signal to the child process, so kill the
+          # process group name too; the log is absent if wrangler never started.
           kill "$pid" || true
-          cat wrangler.log
+          pkill -f 'wrangler dev' || true
+          cat wrangler.log || true
 
   smoke-container:
     name: Smoke the container adapter
@@ -184,4 +188,7 @@ jobs:
 
       - name: Remove leftover containers
         if: always()
-        run: docker ps -a --filter name=vagrant-registry-smoke --format '{{.Names}}' | xargs -r docker rm -f
+        shell: bash
+        run: |
+          set -o pipefail
+          docker ps -a --filter name=vagrant-registry-smoke --format '{{.Names}}' | xargs -r docker rm -f
