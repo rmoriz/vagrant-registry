@@ -38,7 +38,7 @@ impl LoadError {
 pub fn load_dir(root: &Path) -> Result<Vec<(String, Catalog)>, Vec<LoadError>> {
     let mut files = Vec::new();
     let mut errors = Vec::new();
-    collect_files(root, root, &mut files, &mut errors);
+    let root_readable = collect_files(root, root, &mut files, &mut errors);
     files.sort();
 
     let mut entries = Vec::new();
@@ -117,7 +117,7 @@ pub fn load_dir(root: &Path) -> Result<Vec<(String, Catalog)>, Vec<LoadError>> {
         }
     }
 
-    if files.is_empty() {
+    if files.is_empty() && root_readable {
         errors.push(LoadError::single(
             root.display().to_string(),
             "data",
@@ -196,14 +196,22 @@ fn error(field: impl Into<String>, message: impl Into<String>) -> ValidationErro
     }
 }
 
-fn collect_files(root: &Path, dir: &Path, files: &mut Vec<PathBuf>, errors: &mut Vec<LoadError>) {
+/// Collects `*.json` files below `dir` and returns whether `dir` itself was
+/// readable. Unreadable subdirectories are recorded as errors and do not stop
+/// the walk.
+fn collect_files(
+    root: &Path,
+    dir: &Path,
+    files: &mut Vec<PathBuf>,
+    errors: &mut Vec<LoadError>,
+) -> bool {
     let dir_display = relative_display(root, dir);
 
     let entries = match fs::read_dir(dir) {
         Ok(entries) => entries,
         Err(err) => {
             errors.push(LoadError::single(dir_display, "io", err.to_string()));
-            return;
+            return false;
         }
     };
 
@@ -220,6 +228,8 @@ fn collect_files(root: &Path, dir: &Path, files: &mut Vec<PathBuf>, errors: &mut
             Err(err) => errors.push(LoadError::single(&dir_display, "io", err.to_string())),
         }
     }
+
+    true
 }
 
 fn is_json(path: &Path) -> bool {
@@ -237,6 +247,11 @@ fn relative_display(root: &Path, path: &Path) -> String {
 }
 
 fn expected_name(file: &str) -> String {
+    debug_assert!(
+        file.len() >= 5 && file.is_char_boundary(file.len() - 5),
+        "{file:?} must end with a .json suffix"
+    );
+
     match file.len().checked_sub(5) {
         Some(index) if file[index..].eq_ignore_ascii_case(".json") => file[..index].to_string(),
         _ => file.to_string(),
@@ -383,6 +398,16 @@ mod tests {
         }
     }
 
+    /// Pads one provider URL so the rendering is exactly `MAX_DOCUMENT_BYTES`.
+    fn pad_to_cap(mut catalog: Catalog) -> Catalog {
+        let delta = MAX_DOCUMENT_BYTES - rendered_len(&catalog);
+        catalog.versions[0].providers[0]
+            .url
+            .push_str(&"x".repeat(delta));
+        assert_eq!(rendered_len(&catalog), MAX_DOCUMENT_BYTES);
+        catalog
+    }
+
     #[test]
     fn rejects_empty_root_with_data_field() {
         let dir = TempDir::new().unwrap();
@@ -392,6 +417,18 @@ mod tests {
         assert_eq!(errors.len(), 1, "{errors:?}");
         assert_eq!(fields(&errors), ["data"]);
         assert_eq!(errors[0].file, dir.path().display().to_string());
+    }
+
+    #[test]
+    fn reports_missing_root_as_one_io_error() {
+        let dir = TempDir::new().unwrap();
+        let missing = dir.path().join("missing");
+
+        let errors = load_errors(&missing);
+
+        assert_eq!(errors.len(), 1, "{errors:?}");
+        assert_eq!(fields(&errors), ["io"]);
+        assert_eq!(errors[0].file, missing.display().to_string());
     }
 
     #[test]
@@ -545,6 +582,42 @@ mod tests {
         assert_eq!(errors.len(), 1, "{errors:?}");
         assert_eq!(fields(&errors), ["total_bytes"]);
         assert_eq!(errors[0].file, dir.path().display().to_string());
+    }
+
+    #[test]
+    fn accepts_document_exactly_at_rendered_cap() {
+        let dir = TempDir::new().unwrap();
+        let catalog = pad_to_cap(fixture_below(MAX_DOCUMENT_BYTES));
+        assert_eq!(rendered_len(&catalog), MAX_DOCUMENT_BYTES);
+        write_catalog(dir.path(), "acme/base.json", &catalog);
+
+        let entries = load_dir(dir.path()).unwrap();
+
+        assert_eq!(entries.len(), 1, "{entries:?}");
+        assert_eq!(entries[0].0, "acme/base");
+    }
+
+    #[test]
+    fn accepts_tree_exactly_at_total_cap() {
+        let dir = TempDir::new().unwrap();
+        let base = fixture_below(MAX_DOCUMENT_BYTES);
+        let mut total = 0;
+        let files = MAX_TOTAL_BYTES / MAX_DOCUMENT_BYTES;
+
+        for index in 0..files {
+            let name = format!("acme/box{index}");
+            let mut catalog = base.clone();
+            catalog.name = name.clone();
+            let catalog = pad_to_cap(catalog);
+            total += rendered_len(&catalog);
+            write_catalog(dir.path(), &format!("{name}.json"), &catalog);
+        }
+
+        assert_eq!(total, MAX_TOTAL_BYTES);
+
+        let entries = load_dir(dir.path()).unwrap();
+
+        assert_eq!(entries.len(), files, "{entries:?}");
     }
 
     #[test]
