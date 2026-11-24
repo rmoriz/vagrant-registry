@@ -21,8 +21,10 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
 async fn handler(req: Request, _ctx: RouteContext<()>) -> Result<Response> {
     // `path()` is already query- and fragment-free with percent-encoding intact;
     // `request_path` keeps the adapter honest if that ever changes.
-    let method = req.method();
-    let reply = handle(method.as_ref(), request_path(&req.path()));
+    // `worker::Method` has no extension variant and collapses unknown methods
+    // to `GET`, so the inner request's raw string is used instead.
+    let method = req.inner().method();
+    let reply = handle(&method, request_path(&req.path()));
     respond(reply)
 }
 
