@@ -1,73 +1,56 @@
 # vagrant-registry
 
-Design and implementation plans for a **catalog-only Vagrant box registry**:
-a service or static site that answers the version/provider index for
-`VAGRANT_SERVER_URL`, while all `.box` binaries stay wherever they already
-live.
+A read-only Vagrant box registry. It serves catalog JSON — which versions and
+providers exist for an `org/box`, and where their `.box` files live — and never
+touches the binaries themselves. Catalogs live as one JSON document per box
+under `data/`, are validated and embedded at build time, and are published by
+pull request. The same handler runs as a Cloudflare Worker and as a container
+image, so both targets serve identical catalog bytes.
 
-> Status: design and plans only. No application code has been written yet.
-> Date: 2026-11-13.
+## Served paths
 
-## Read in this order
-
-1. [Design and contract](docs/superpowers/specs/2026-11-13-vagrant-registry-design.md)
-   — what Vagrant actually calls, the JSON contract, the shared YAML source
-   format, validation rules, and the four options with trade-offs.
-2. One implementation plan:
-   - [Option A — static catalogs](docs/superpowers/plans/2026-11-13-option-a-static-catalogs.md)
-     (S3 + CloudFront for `VAGRANT_SERVER_URL`; GitHub Pages for direct
-     `box_url` catalogs)
-   - [Option B — file-backed service](docs/superpowers/plans/2026-11-13-option-b-file-backed-service.md)
-     (small Go service, YAML files on disk, no database)
-   - [Option C — database registry](docs/superpowers/plans/2026-11-13-option-c-database-registry.md)
-     (Go service, SQLite, admin API, minimal admin UI)
-   - [Option D — Cloudflare Workers + D1](docs/superpowers/plans/2026-11-13-option-d-cloudflare-rust.md)
-     (Rust Worker, D1, same admin API/UI and YAML import, no server to run)
-
-## Which option?
-
-| If this is true | Choose |
+| Path | Purpose |
 |---|---|
-| Catalogs change by pull request; you want zero application runtime; a few minutes of publish latency is fine | **A** |
-| CI should publish immediately without an S3/Pages deploy step; you are fine running one small container | **B** |
-| Non-engineers edit boxes in a browser, or you need queryable records and an admin API | **C** |
-| You want C’s admin API/UI and YAML import, but do not want to operate a server or database; Cloudflare Workers + D1 is acceptable | **D** |
+| `/api/v2/vagrant/{org}/{box}` | Vagrant's preferred discovery route |
+| `/{org}/{box}` | Legacy fallback, identical bytes |
+| `/catalogs/{org}/{box}.json` | Direct catalog URL for `box_url` |
 
-Recommendation for the stated goal (“registry only, no hosting”): **A**.
-It has the smallest operational surface and is fully compatible with
-`VAGRANT_SERVER_URL` when deployed to S3 + CloudFront. Choose B when
-publishing must be decoupled from static deployment, C when a UI or many
-editors justify a database, and D when you want C’s feature set as a
-managed serverless deployment.
+All three accept `GET` and `HEAD`; `HEAD` carries the same status and
+`Content-Type` with no body. `/` is an index page and `/healthz` is a health
+probe. Unknown boxes are `404`; any other method on a resolved path is `405`
+with `Allow: GET, HEAD`.
 
-## Important
+## Add a box
 
-These are **alternative** plans, not a sequence. Pick one. If you want to
-compare them side by side, run each in its own branch or worktree; do not
-implement more than one in the same working tree.
+Copy `data/acme/base.json` to `data/<org>/<box>.json`, make the document's
+`name` match that path, edit it, run `cargo test -p vagrant-registry-core`, and
+open a pull request. Full field rules, client setup, and local preview are in
+[docs/usage.md](docs/usage.md).
 
-Options A/B/C use Go 1.22+; Option D uses Rust 1.91 on Cloudflare Workers.
-All four share the same catalog schema and validation rules from the design
-doc. A and B use the same YAML files; C and D import them and expose the
-same JSON contract through an API.
+## Deploy
 
-## Repository layout the plans produce
+Push to `main` to deploy production to Cloudflare Workers, or push to `staging`
+for a staging Worker; both go through the test gate and use two GitHub
+environments with their own secrets. Alternatively run the published image
+behind your own TLS proxy. Setup, rollback, and proxy requirements are in
+[docs/deployment.md](docs/deployment.md).
 
-```text
-.
-├── README.md
-├── LICENSE
-├── docs/
-│   ├── superpowers/
-│   │   ├── specs/2026-11-13-vagrant-registry-design.md
-│   │   └── plans/
-│   │       ├── 2026-11-13-option-a-static-catalogs.md
-│   │       ├── 2026-11-13-option-b-file-backed-service.md
-│   │       ├── 2026-11-13-option-c-database-registry.md
-│   │       └── 2026-11-13-option-d-cloudflare-rust.md
-│   └── ... deployment runbooks created by the chosen plan
-└── (application files created by the chosen plan)
-```
+## Limits
+
+- 1 MiB per rendered catalog document, 16 MiB in total; both are build errors.
+- Catalog responses are cacheable for 60 seconds (`public, max-age=60`).
+- Documents are strict: unknown fields, invalid versions, and name/path
+  mismatches fail the build.
+
+## Non-goals
+
+- No admin API or admin UI, and no authentication.
+- No database or any runtime store.
+- No box hosting, upload, or proxying; provider URLs point at your storage.
+- No Vagrant Cloud `/api/v1` compatibility.
+
+The design is in
+[docs/superpowers/specs/2026-11-24-vagrant-registry-rust-design.md](docs/superpowers/specs/2026-11-24-vagrant-registry-rust-design.md).
 
 ## License
 

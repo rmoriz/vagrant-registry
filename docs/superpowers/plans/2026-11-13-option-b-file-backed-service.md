@@ -1,3 +1,5 @@
+> **Superseded** by [the 2026-11-24 Rust design](../specs/2026-11-24-vagrant-registry-rust-design.md) and [its plan](2026-11-24-vagrant-registry-rust.md). Kept as history.
+
 # Option B — File-Backed Service Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
