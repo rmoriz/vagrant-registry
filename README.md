@@ -55,6 +55,9 @@ Copy `data/acme/base.json` to `data/<org>/<box>.json`, make the document's
 open a pull request. Full field rules, client setup, and caching behaviour are
 in [docs/usage.md](docs/usage.md).
 
+`data/oraclelinux/` is a mirror of Oracle's published box metadata; refresh it
+with `./scripts/oracle_boxes.py` rather than by hand.
+
 ## Deploy
 
 Push to `main` to deploy production to Cloudflare Workers, or push to `staging`

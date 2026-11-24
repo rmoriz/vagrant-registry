@@ -50,6 +50,24 @@ resolve percent-encoded names such as `/acme%2Fbase`.
 4. Commit, push, and open a pull request. A merge to `main` deploys
    production; a merge to `staging` deploys staging.
 
+## Refreshing the Oracle Linux catalogs
+
+`data/oraclelinux/` is a mirror of Oracle's own box metadata, not invented
+data. When Oracle publishes a new build, refresh the mirror instead of editing
+the documents by hand:
+
+```bash
+./scripts/oracle_boxes.py           # rewrite from oracle.github.io
+./scripts/oracle_boxes.py --check   # exit 1 if the tree is behind, write nothing
+cargo test -p vagrant-registry-core
+```
+
+The script keeps every version, provider, URL and checksum, drops the Oracle
+fields the model lacks, and derives `architecture` from the box name
+(`-aarch64` becomes `arm64`, everything else `amd64`). Oracle is the source of
+truth for these boxes; do not hand-edit them, because the next refresh
+overwrites the file.
+
 ## Document shape
 
 Documents are strict JSON, shaped like this, and every field is spelled out
