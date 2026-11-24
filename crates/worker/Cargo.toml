@@ -1,0 +1,13 @@
+[package]
+name = "vagrant-registry-worker"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.91"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+vagrant-registry-core = { path = "../core" }
+worker.workspace = true
