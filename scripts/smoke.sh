@@ -30,7 +30,7 @@ expect_header() {
 # Every 200 and every 404 carries nosniff.
 for path in / /healthz /acme/base /api/v2/vagrant/acme/base /catalogs/acme/base.json; do
   expect_status "$base$path" 200
-  expect_header "$base$path" 'x-content-type-options: nosniff'
+  expect_header "$base$path" 'x-content-type-options: nosniff$'
 done
 printf 'ok: 200s\n'
 
@@ -49,20 +49,22 @@ printf 'ok: identical catalog bodies\n'
 
 # HEAD carries headers but no body.
 for path in / /healthz /acme/base /api/v2/vagrant/acme/base /catalogs/acme/base.json; do
-  expect_status "$base$path" 200
-  size=$(curl -sSI -o /dev/null -w '%{size_download}' "$base$path") || fail "$path: HEAD failed"
+  out=$(curl -sSI -o /dev/null -w '%{http_code} %{size_download}' "$base$path") || fail "$path: HEAD failed"
+  code=${out% *}
+  size=${out#* }
+  [ "$code" = 200 ] || fail "$path: HEAD want 200, got $code"
   [ "$size" = 0 ] || fail "$path: HEAD downloaded $size bytes"
 done
 expect_header "$base/acme/base" 'content-type: application/json'
 printf 'ok: HEAD\n'
 
 expect_status "$base/acme/a..b" 200
-expect_header "$base/acme/a..b" 'x-content-type-options: nosniff'
+expect_header "$base/acme/a..b" 'x-content-type-options: nosniff$'
 printf 'ok: double-dot path\n'
 
 for path in /acme/nope /api/v2/vagrant/acme/%2e%2e /acme//base /catalogs/acme/base; do
   expect_status "$base$path" 404
-  expect_header "$base$path" 'x-content-type-options: nosniff'
+  expect_header "$base$path" 'x-content-type-options: nosniff$'
 done
 printf 'ok: 404s\n'
 
