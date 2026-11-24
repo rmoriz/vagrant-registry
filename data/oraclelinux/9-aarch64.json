@@ -1,15 +1,67 @@
 {
   "name": "oraclelinux/9-aarch64",
-  "description": "Oracle Linux 9 (Apple Silicon). Dummy catalog: URLs point at public-yum.oracle.com and the checksums are placeholders.",
+  "description": "Oracle Linux 9 (Apple Silicon)",
   "versions": [
     {
-      "version": "9.6",
+      "version": "9.8.184",
       "providers": [
         {
           "name": "virtualbox",
-          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol9/OL9U6_arm64-vagrant-virtualbox.box",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol9-aarch64/OL9U8_aarch64-vagrant-virtualbox-b184.box",
           "checksum_type": "sha256",
-          "checksum": "f41d668a50980948dbdebbeca1d65181b0a764bddc54f8f243719cdb6ecfd69e",
+          "checksum": "ff560263923bf95701a8be307e1f4b4911f5befd0e7197079874512b5eac621f",
+          "architecture": "arm64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "9.7.176",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol9-aarch64/OL9U7_aarch64-vagrant-virtualbox-b176.box",
+          "checksum_type": "sha256",
+          "checksum": "6c0325146259920c35e069fe3b69fe77b3f0e1a262f54478b14671b05aba70d7",
+          "architecture": "arm64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "9.7.160",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol9-aarch64/OL9U7_aarch64-vagrant-virtualbox-b160.box",
+          "checksum_type": "sha256",
+          "checksum": "a78890e1229cf5f43d7cb151b010d1892a9140d4b0758f8bb519842afcc27f92",
+          "architecture": "arm64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "9.6.151",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol9-aarch64/OL9U6_aarch64-vagrant-virtualbox-b151.box",
+          "checksum_type": "sha256",
+          "checksum": "e2ce46eb22fdaef44948722c46230b704a652eec8fa3f15338787b3a5e36e160",
+          "architecture": "arm64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "9.5.129",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol9-aarch64/OL9U5_aarch64-vagrant-virtualbox-b129.box",
+          "checksum_type": "sha256",
+          "checksum": "afcce734f624eeca31c72efd1f5d67f0937f1cb774288a97636b42420ac65422",
           "architecture": "arm64",
           "default_architecture": true
         }

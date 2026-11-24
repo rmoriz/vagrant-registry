@@ -1,23 +1,80 @@
 {
   "name": "oraclelinux/10-btrfs",
-  "description": "Oracle Linux 10 with Btrfs root filesystem (x86_64). Dummy catalog: URLs point at public-yum.oracle.com and the checksums are placeholders.",
+  "description": "Oracle Linux 10 (Btrfs) (x86_64)",
   "versions": [
     {
-      "version": "10.1",
+      "version": "10.1.709",
       "providers": [
         {
           "name": "virtualbox",
-          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_amd64-vagrant-virtualbox-btrfs.box",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_x86_64-vagrant-btrfs-virtualbox-b709.box",
           "checksum_type": "sha256",
-          "checksum": "2a0db51e227a2c527c0d7e43ed1bcbd896970eee808c536bb0ddc09a8affd6ad",
+          "checksum": "4602cd9777770c640b4d21861a8a3c6aa27ef37fe5fe8bdfa96455897afcd3b1",
           "architecture": "amd64",
           "default_architecture": true
-        },
+        }
+      ]
+    },
+    {
+      "version": "10.1.711",
+      "providers": [
         {
           "name": "libvirt",
-          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_amd64-vagrant-libvirt-btrfs.box",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_x86_64-vagrant-btrfs-libvirt-b711.box",
           "checksum_type": "sha256",
-          "checksum": "4d21d269945f989440a8c1d207b71bb76ea02f79986e8b0c20767c66712bcb93",
+          "checksum": "16634e40245a61318ba6ec966c02764e56e9df9be8ae9e30d1e5d88bf95f1224",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "10.1.691",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_x86_64-vagrant-btrfs-virtualbox-b691.box",
+          "checksum_type": "sha256",
+          "checksum": "63c2a5eb91857fd90723937c04e44688cfc500f72031a153d199c9628b04703a",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "10.1.693",
+      "providers": [
+        {
+          "name": "libvirt",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_x86_64-vagrant-btrfs-libvirt-b693.box",
+          "checksum_type": "sha256",
+          "checksum": "a535bfdfd79ba4b6304ebf78892de3399ba145aedd2d2ae5a087d684b1175631",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "10.0.683",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol10/OL10U0_x86_64-vagrant-btrfs-virtualbox-b683.box",
+          "checksum_type": "sha256",
+          "checksum": "d5421456ef26a8dd36f5a87aba20c71a97bb2c3c313a7a356020d2676a9a5482",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "10.0.685",
+      "providers": [
+        {
+          "name": "libvirt",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol10/OL10U0_x86_64-vagrant-btrfs-libvirt-b685.box",
+          "checksum_type": "sha256",
+          "checksum": "44a2c708830dff00b0d6f501f27b37d27554ca098d2932c2fd7a1ff636d7cccd",
           "architecture": "amd64",
           "default_architecture": true
         }

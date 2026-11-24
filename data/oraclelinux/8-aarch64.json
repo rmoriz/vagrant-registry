@@ -1,15 +1,41 @@
 {
   "name": "oraclelinux/8-aarch64",
-  "description": "Oracle Linux 8 (Apple Silicon). Dummy catalog: URLs point at public-yum.oracle.com and the checksums are placeholders.",
+  "description": "Oracle Linux 8 (Apple Silicon)",
   "versions": [
     {
-      "version": "8.10",
+      "version": "8.10.172",
       "providers": [
         {
           "name": "virtualbox",
-          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol8/OL8U10_arm64-vagrant-virtualbox.box",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol8-aarch64/OL8U10_aarch64-vagrant-virtualbox-b172.box",
           "checksum_type": "sha256",
-          "checksum": "74c332630ac2b2ed5bea02890730257c4add44f48f711aa803f517f42371ab65",
+          "checksum": "63567a317ac6a2d3b5f00736d0ae3efe7ecfb453bb21e391c6420748c5533060",
+          "architecture": "arm64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "8.10.164",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol8-aarch64/OL8U10_aarch64-vagrant-virtualbox-b164.box",
+          "checksum_type": "sha256",
+          "checksum": "2b6517c9acfbb2373fdb86c41ae5217fd45f14e933bce3eb441ba4b618d5afd0",
+          "architecture": "arm64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "8.10.125",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol8-aarch64/OL8U10_aarch64-vagrant-virtualbox-b125.box",
+          "checksum_type": "sha256",
+          "checksum": "4dee0c6446ce9fe2093f0eb696696b945bf5044ee8dd61e53df3864fb20607cd",
           "architecture": "arm64",
           "default_architecture": true
         }

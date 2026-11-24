@@ -1,23 +1,80 @@
 {
   "name": "oraclelinux/10",
-  "description": "Oracle Linux 10 (x86_64). Dummy catalog: URLs point at public-yum.oracle.com and the checksums are placeholders.",
+  "description": "Oracle Linux 10 (x86_64)",
   "versions": [
     {
-      "version": "10.1",
+      "version": "10.1.708",
       "providers": [
         {
           "name": "virtualbox",
-          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_amd64-vagrant-virtualbox.box",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_x86_64-vagrant-virtualbox-b708.box",
           "checksum_type": "sha256",
-          "checksum": "a02852d3c3543dc28e10470f0209f9a985a93352172eb9dc0d582bf3a2c59a52",
+          "checksum": "0dd8849f7c870294c7d5d1ee6b99ca79fa3aae374e355bf5827f3123ffe6bd56",
           "architecture": "amd64",
           "default_architecture": true
-        },
+        }
+      ]
+    },
+    {
+      "version": "10.1.710",
+      "providers": [
         {
           "name": "libvirt",
-          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_amd64-vagrant-libvirt.box",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_x86_64-vagrant-libvirt-b710.box",
           "checksum_type": "sha256",
-          "checksum": "2dc0e662536fc4fabcec9f1205315efd3ade71ed8970d2b47edffb0a2356cbb9",
+          "checksum": "66b15e98537906b1d0f60bcba12a2c47fad25d421760ed1ec8eafd0fbe59a25a",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "10.1.690",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_x86_64-vagrant-virtualbox-b690.box",
+          "checksum_type": "sha256",
+          "checksum": "a7bdd51a79b391f1a22aad9b38e79433164d22f0a9334fb7e317369352e46a70",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "10.1.692",
+      "providers": [
+        {
+          "name": "libvirt",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_x86_64-vagrant-libvirt-b692.box",
+          "checksum_type": "sha256",
+          "checksum": "5209b875045a449c4d6e5edb74f64898cb4e3bc5d99695232f63e3faf2f24406",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "10.0.682",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol10/OL10U0_x86_64-vagrant-virtualbox-b682.box",
+          "checksum_type": "sha256",
+          "checksum": "060cd505a33938661bb3c7dad0d4fffbc1801f57267dcaa87d3f5c542bb1be29",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    },
+    {
+      "version": "10.0.684",
+      "providers": [
+        {
+          "name": "libvirt",
+          "url": "https://yum.oracle.com/boxes/oraclelinux/ol10/OL10U0_x86_64-vagrant-libvirt-b684.box",
+          "checksum_type": "sha256",
+          "checksum": "c0808977959d91703f4eb1448ecd96911a61c39540d0b004712b0f90162b1441",
           "architecture": "amd64",
           "default_architecture": true
         }
