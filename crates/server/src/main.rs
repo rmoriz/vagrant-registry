@@ -197,7 +197,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn empty_body_keeps_its_headers_and_gains_no_content_length() {
+    async fn empty_body_keeps_its_headers_and_sets_no_content_length_in_the_map() {
         let reply = Reply {
             status: 200,
             headers: &JSON_ONLY,

@@ -47,6 +47,12 @@ cmp -s "$d/1" "$d/3" || fail "catalog forms differ: /acme/base vs /catalogs/acme
 cmp -s "$d/1" <(curl -sS "$base/acme/base") || fail "/acme/base download differs"
 printf 'ok: identical catalog bodies\n'
 
+# A percent-encoded separator must resolve to the same catalog, decoded once.
+expect_status "$base/acme%2Fbase" 200
+expect_header "$base/acme%2Fbase" 'x-content-type-options: nosniff$'
+cmp -s "$d/1" <(curl -sS "$base/acme%2Fbase") || fail "/acme%2Fbase does not resolve to the same bytes"
+printf 'ok: escaped separator\n'
+
 # HEAD carries headers but no body.
 for path in / /healthz /acme/base /api/v2/vagrant/acme/base /catalogs/acme/base.json; do
   out=$(curl -sSI -o /dev/null -w '%{http_code} %{size_download}' "$base$path") || fail "$path: HEAD failed"
@@ -54,6 +60,9 @@ for path in / /healthz /acme/base /api/v2/vagrant/acme/base /catalogs/acme/base.
   size=${out#* }
   [ "$code" = 200 ] || fail "$path: HEAD want 200, got $code"
   [ "$size" = 0 ] || fail "$path: HEAD downloaded $size bytes"
+  : >"$d/head"
+  curl -sS -X HEAD -H 'Connection: close' --max-time 5 -o "$d/head" "$base$path" || fail "$path: HEAD drain failed"
+  [ ! -s "$d/head" ] || fail "$path: HEAD returned body bytes"
 done
 expect_header "$base/acme/base" 'content-type: application/json'
 printf 'ok: HEAD\n'

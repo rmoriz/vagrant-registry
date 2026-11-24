@@ -7,6 +7,14 @@ No box binary hosting, proxying, or Vagrant Cloud feature parity.
 
 ---
 
+> **Errata (2026-11-24):** the shipped implementation is the
+> [2026-11-24 Rust design](2026-11-24-vagrant-registry-rust-design.md). Source
+> documents are strict JSON under `data/` (not YAML under `boxes/`), there is
+> no admin API, no admin UI, and no `REGISTRY_ADMIN_TOKEN`, and the
+> `/catalogs/{org}/{box}.json` route exists on every deployment. §2 (what
+> Vagrant calls), §2.3 (catalog JSON) and §4.1 (validation) remain binding as
+> written; §3, §5 and the admin parts of §6 are history.
+
 ## 1. Intent
 
 Vagrant’s default box server (`DEFAULT_SERVER_URL`,
@@ -215,6 +223,8 @@ These rules decide whether a correct-looking catalog still fails:
 
 ## 3. Source format
 
+> **Errata:** see the note at the top; the shipped source format is JSON under `data/`.
+
 Options A and B use one YAML file per box. Option C accepts the equivalent
 JSON through its admin API and can import the same YAML. Option D accepts the
 same JSON and YAML through a Worker; its YAML importer requires versions to be
@@ -363,6 +373,8 @@ show a complete report.
 ---
 
 ## 5. Options
+
+> **Errata:** see the note at the top; all four options are history.
 
 ### Option A — Git-declared catalogs, static generation
 

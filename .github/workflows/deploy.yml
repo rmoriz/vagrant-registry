@@ -5,6 +5,8 @@ on:
     branches: [main, staging]
   workflow_dispatch:
 
+# A dispatch from any other branch runs only the gate and deploys nothing.
+
 permissions:
   contents: read
 

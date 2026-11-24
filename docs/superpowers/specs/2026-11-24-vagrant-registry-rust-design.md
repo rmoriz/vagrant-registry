@@ -205,8 +205,9 @@ Rules beyond the contract:
 
 `crates/core/build.rs`:
 
-1. Runs `vagrant_registry_core::tree::load_dir(data)` as a build-dependency
-   (host target).
+1. Pulls the pure modules in via `#[path]` — a self `[build-dependencies]`
+   would be a package cycle — and calls `tree::load_dir(data)` on the host
+   target.
 2. Collects **all** errors, not the first.
 3. On any error: `panic!` with a report naming file, field, and message, so
    `cargo build`, `cargo test`, and CI all fail.
@@ -402,8 +403,9 @@ headers.
 - Limits are on rendered bytes, checked at build with a 16 MiB total budget.
 - Documents reject unknown fields.
 - Neither adapter sets `Content-Length`.
-- The index page and `/healthz` are additions beyond the contract and carry no
-  catalog detail beyond a count.
+- The index page and `/healthz` are additions beyond the contract. The index
+  lists each box name with its escaped description and version count; nothing
+  else.
 - The four earlier option plans stay as history behind a one-line superseded
   banner pointing at this design; `README.md` is rewritten to describe this
   single implementation.
