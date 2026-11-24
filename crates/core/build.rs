@@ -17,6 +17,19 @@ use tree::{LoadError, load_dir, to_table};
 fn main() {
     println!("cargo:rerun-if-changed=../../data");
 
+    // `rerun-if-changed=../../data` turns off Cargo's default tracking of the
+    // package's own files, so the sources pulled in through `#[path]` above
+    // (the accepted self-dependency deviation) need hooks of their own.
+    for source in [
+        "model.rs",
+        "render.rs",
+        "tree.rs",
+        "validate.rs",
+        "version.rs",
+    ] {
+        println!("cargo:rerun-if-changed=src/{source}");
+    }
+
     let data_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../data");
 
     let catalogs = match load_dir(&data_dir) {
@@ -51,9 +64,10 @@ fn report(errors: &[LoadError]) -> String {
 }
 
 /// Renders a file path relative to the repository root, so a report names
-/// `data/acme/base.json` rather than `acme/base.json`.
+/// `data/acme/base.json` rather than `acme/base.json`. Bare catalog names from
+/// `to_table` errors and absolute paths are left as they are.
 fn label(file: &str) -> String {
-    if Path::new(file).is_absolute() {
+    if Path::new(file).is_absolute() || !file.ends_with(".json") {
         file.to_string()
     } else {
         format!("data/{file}")
