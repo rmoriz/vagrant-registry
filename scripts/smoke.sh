@@ -61,7 +61,13 @@ for path in / /healthz /acme/base /api/v2/vagrant/acme/base /catalogs/acme/base.
   [ "$code" = 200 ] || fail "$path: HEAD want 200, got $code"
   [ "$size" = 0 ] || fail "$path: HEAD downloaded $size bytes"
   : >"$d/head"
-  curl -sS -X HEAD -H 'Connection: close' --max-time 5 -o "$d/head" "$base$path" || fail "$path: HEAD drain failed"
+  # A HEAD reply may legitimately carry the entity's content-length — the edge
+  # cache answers HEAD from a cached GET — and curl then waits for a body that
+  # a HEAD never sends, exiting 18. Any other exit is a real failure.
+  size=$(curl -sS -X HEAD -H 'Connection: close' --max-time 5 -o "$d/head" \
+    -w '%{size_download}' "$base$path" 2>/dev/null) && rc=0 || rc=$?
+  [ "$rc" = 0 ] || [ "$rc" = 18 ] || fail "$path: HEAD drain failed (curl exit $rc)"
+  [ "$size" = 0 ] || fail "$path: HEAD downloaded $size bytes"
   [ ! -s "$d/head" ] || fail "$path: HEAD returned body bytes"
 done
 expect_header "$base/acme/base" 'content-type: application/json'
