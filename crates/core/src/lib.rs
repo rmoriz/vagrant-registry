@@ -1,3 +1,4 @@
+pub mod catalogs;
 pub mod model;
 pub mod render;
 pub mod tree;
