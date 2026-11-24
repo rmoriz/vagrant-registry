@@ -37,7 +37,7 @@ pub enum Body {
     Empty,
     Json(&'static [u8]),
     Html(String),
-    Text(&'static str),
+    Text(String),
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -186,18 +186,18 @@ pub fn handle(method: &str, raw_path: &str) -> Reply {
 
     let resolved = match target {
         Target::Index => Some(reply(200, Body::Html(index_document()))),
-        Target::Health => Some(reply(200, Body::Html(format!("ok {}\n", CATALOGS.len())))),
+        Target::Health => Some(reply(200, Body::Text(format!("ok {}\n", CATALOGS.len())))),
         Target::Catalog(name) => lookup(&name).map(|bytes| reply(200, Body::Json(bytes))),
         Target::Missing => None,
     };
 
     let mut reply = match resolved {
-        None => reply(404, Body::Text(NOT_FOUND)),
+        None => reply(404, Body::Text(NOT_FOUND.to_string())),
         Some(reply) if method == "GET" || method == "HEAD" => reply,
         Some(_) => Reply {
             status: 405,
             headers: &METHOD_NOT_ALLOWED_HEADERS,
-            body: Body::Text(METHOD_NOT_ALLOWED),
+            body: Body::Text(METHOD_NOT_ALLOWED.to_string()),
         },
     };
 
@@ -450,7 +450,7 @@ mod tests {
         );
         assert_eq!(
             header(&handle("GET", "/healthz"), "content-type"),
-            Some("text/html; charset=utf-8")
+            Some("text/plain; charset=utf-8")
         );
         assert_eq!(
             header(&handle("GET", "/acme/a..b"), "content-type"),
@@ -468,7 +468,7 @@ mod tests {
     #[test]
     fn not_found_body_is_fixed_text_without_a_path_echo() {
         let reply = handle("GET", "/acme/nope");
-        assert_eq!(reply.body, Body::Text("not found"));
+        assert_eq!(reply.body, Body::Text("not found".to_string()));
 
         let body = match reply.body {
             Body::Text(text) => text,
@@ -478,11 +478,11 @@ mod tests {
 
         assert_eq!(
             handle("POST", "/acme/base").body,
-            Body::Text("method not allowed")
+            Body::Text("method not allowed".to_string())
         );
         assert_eq!(
             handle("DELETE", "/healthz").body,
-            Body::Text("method not allowed")
+            Body::Text("method not allowed".to_string())
         );
     }
 
@@ -490,7 +490,7 @@ mod tests {
     fn healthz_reports_the_catalog_count() {
         assert_eq!(
             handle("GET", "/healthz").body,
-            Body::Html(format!("ok {}\n", CATALOGS.len()))
+            Body::Text(format!("ok {}\n", CATALOGS.len()))
         );
     }
 
