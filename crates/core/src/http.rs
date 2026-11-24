@@ -9,7 +9,13 @@ const METHOD_NOT_ALLOWED: &str = "method not allowed";
 static CATALOG_HEADERS: [(&str, &str); 3] = [
     ("content-type", "application/json"),
     ("x-content-type-options", "nosniff"),
-    ("cache-control", "public, max-age=60"),
+    // Catalogs are baked into the deployment, so a URL's bytes cannot change
+    // until a new one ships. Fresh for a day, then served stale for up to a
+    // week while revalidating, or for a week if the origin is unreachable.
+    (
+        "cache-control",
+        "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800",
+    ),
 ];
 static HTML_HEADERS: [(&str, &str); 3] = [
     ("content-type", "text/html; charset=utf-8"),
@@ -410,7 +416,9 @@ mod tests {
                 );
                 assert_eq!(
                     header(&reply, "cache-control"),
-                    Some("public, max-age=60"),
+                    Some(
+                        "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800"
+                    ),
                     "{method} {path}"
                 );
             }

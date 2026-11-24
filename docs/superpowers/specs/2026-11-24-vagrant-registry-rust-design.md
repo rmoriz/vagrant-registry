@@ -88,7 +88,10 @@ These count as failure even if the routes return 200:
   in total, both enforced at build.
 - Data documents are strict: unknown fields are an error, never dropped.
 - Every response sets `X-Content-Type-Options: nosniff`; only a catalog `GET` or
-  `HEAD` may be cached (`public, max-age=60`), everything else is `no-store`.
+  `HEAD` may be cached, everything else is `no-store`. The catalog value is
+  `public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800`:
+  catalogs are immutable per deployment, but the URL is not versioned, so a
+  cache bound is still required.
 - Cloudflare may omit `Content-Length` or report `0` on `HEAD`; status and
   `Content-Type` are the contract. Vagrant does not read `Content-Length` for
   discovery.

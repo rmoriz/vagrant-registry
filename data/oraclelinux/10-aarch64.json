@@ -8,8 +8,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol10-aarch64/OL10U1_aarch64-vagrant-virtualbox-b180.box",
-          "checksum_type": "sha256",
           "checksum": "37006675f37ac8c40b58ca4d4c305ef2a8a3582fed0f409be1040fc7bd75964b",
+          "checksum_type": "sha256",
           "architecture": "arm64",
           "default_architecture": true
         }
@@ -21,8 +21,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol10-aarch64/OL10U1_aarch64-vagrant-virtualbox-b156.box",
-          "checksum_type": "sha256",
           "checksum": "c022fbe9ded33eacaff952b95905696a09ce8f3324cc8cd07bae1744271511e6",
+          "checksum_type": "sha256",
           "architecture": "arm64",
           "default_architecture": true
         }
@@ -34,8 +34,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol10-aarch64/OL10U0_aarch64-vagrant-virtualbox-b147.box",
-          "checksum_type": "sha256",
           "checksum": "9778fdd76eabed383007e44a2456169c215fb085360c997c44ecca8caa59b751",
+          "checksum_type": "sha256",
           "architecture": "arm64",
           "default_architecture": true
         }

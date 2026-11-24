@@ -8,8 +8,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-virtualbox-b654.box",
-          "checksum_type": "sha256",
           "checksum": "5c49f5552bcef7ad763b894ab3b948a8217c17634e221ebe46a8a5f082f5d73d",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }
@@ -21,8 +21,8 @@
         {
           "name": "libvirt",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-libvirt-b656.box",
-          "checksum_type": "sha256",
           "checksum": "26ad60a66b0859f2abe0417b8ca3cc496d070287c605ef996b7d1e9506ceff3a",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }
@@ -34,8 +34,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-virtualbox-b518.box",
-          "checksum_type": "sha256",
           "checksum": "c4f9645e93e20142a658b3eef5db6672cab78f310daa88bdc2c9eb1f8af32793",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }
@@ -47,8 +47,8 @@
         {
           "name": "libvirt",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-libvirt-b520.box",
-          "checksum_type": "sha256",
           "checksum": "3499d790432f01d5206b2ac72ebc486692621e7cc198451968512ee7f5aab581",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }
@@ -60,8 +60,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-virtualbox-b337.box",
-          "checksum_type": "sha256",
           "checksum": "723cb3b2a13d3fc0410cb4856c264b69390979956957d518e0148fc600800b07",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }
@@ -73,8 +73,8 @@
         {
           "name": "libvirt",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-libvirt-b338.box",
-          "checksum_type": "sha256",
           "checksum": "5e7dcc2c3f599694f7988a01085c6114007fc3115bdb0e148198ead151b19ad2",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }
@@ -86,8 +86,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-virtualbox-b323.box",
-          "checksum_type": "sha256",
           "checksum": "cffdeebe88c87dd27479c19c3b07cbcc51ddcfb763b364d6612a159bb65caf1f",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }
@@ -99,8 +99,8 @@
         {
           "name": "libvirt",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-libvirt-b317.box",
-          "checksum_type": "sha256",
           "checksum": "a18fcdd1b33b399828cea2351de4b6e575661ddb385497603bab3c31dfc1e482",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }
@@ -112,8 +112,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-virtualbox-b291.box",
-          "checksum_type": "sha256",
           "checksum": "cc5f5dc664354ef99af2d2906dc499ac8a45bad86e90871a65b6ba1a88c0b7da",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }
@@ -125,8 +125,8 @@
         {
           "name": "libvirt",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-libvirt-b292.box",
-          "checksum_type": "sha256",
           "checksum": "4dfd96f37c67d10f4efc6c7b5be5dc399fa3f827d8580df21aa3900c4b3a0d75",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }
@@ -138,8 +138,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-virtualbox-b262.box",
-          "checksum_type": "sha256",
           "checksum": "0d107535c66468f743cfe6cc65018301741855504501a45404fb875b45cccd4a",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }
@@ -151,8 +151,8 @@
         {
           "name": "libvirt",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-libvirt-b263.box",
-          "checksum_type": "sha256",
           "checksum": "33d5293f14c32d982ce89440db10280dc8cce6c961701a0c9b184563da5c9713",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }
@@ -164,8 +164,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-virtualbox-b226.box",
-          "checksum_type": "sha256",
           "checksum": "1fe17919f2a011d0cbab94b417e1436dbb97f2ceaf470d0b671ef2a18d3ba81b",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }
@@ -177,8 +177,8 @@
         {
           "name": "libvirt",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_x86_64-vagrant-btrfs-libvirt-b227.box",
-          "checksum_type": "sha256",
           "checksum": "5317f780fbc2dcf5e7c64d13cbc342cfb3fde8a824a7de2cad0b575fe89ca81e",
+          "checksum_type": "sha256",
           "architecture": "amd64",
           "default_architecture": true
         }

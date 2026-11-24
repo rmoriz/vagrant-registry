@@ -8,8 +8,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol9-aarch64/OL9U8_aarch64-vagrant-virtualbox-b184.box",
-          "checksum_type": "sha256",
           "checksum": "ff560263923bf95701a8be307e1f4b4911f5befd0e7197079874512b5eac621f",
+          "checksum_type": "sha256",
           "architecture": "arm64",
           "default_architecture": true
         }
@@ -21,8 +21,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol9-aarch64/OL9U7_aarch64-vagrant-virtualbox-b176.box",
-          "checksum_type": "sha256",
           "checksum": "6c0325146259920c35e069fe3b69fe77b3f0e1a262f54478b14671b05aba70d7",
+          "checksum_type": "sha256",
           "architecture": "arm64",
           "default_architecture": true
         }
@@ -34,8 +34,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol9-aarch64/OL9U7_aarch64-vagrant-virtualbox-b160.box",
-          "checksum_type": "sha256",
           "checksum": "a78890e1229cf5f43d7cb151b010d1892a9140d4b0758f8bb519842afcc27f92",
+          "checksum_type": "sha256",
           "architecture": "arm64",
           "default_architecture": true
         }
@@ -47,8 +47,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol9-aarch64/OL9U6_aarch64-vagrant-virtualbox-b151.box",
-          "checksum_type": "sha256",
           "checksum": "e2ce46eb22fdaef44948722c46230b704a652eec8fa3f15338787b3a5e36e160",
+          "checksum_type": "sha256",
           "architecture": "arm64",
           "default_architecture": true
         }
@@ -60,8 +60,8 @@
         {
           "name": "virtualbox",
           "url": "https://yum.oracle.com/boxes/oraclelinux/ol9-aarch64/OL9U5_aarch64-vagrant-virtualbox-b129.box",
-          "checksum_type": "sha256",
           "checksum": "afcce734f624eeca31c72efd1f5d67f0937f1cb774288a97636b42420ac65422",
+          "checksum_type": "sha256",
           "architecture": "arm64",
           "default_architecture": true
         }

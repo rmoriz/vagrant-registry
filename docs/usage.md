@@ -197,8 +197,21 @@ smokes the container image.
 ## Caching
 
 A catalog `GET` or `HEAD` is served with
-`Cache-Control: public, max-age=60`. Index, health, and error responses are
-`no-store`. Because of the 60 seconds, a merged change or a host migration can
-take up to a minute to be visible through caches. Vagrant also caches
-outdated checks client-side for an hour, so `vagrant box outdated` is not
-instant either.
+
+```text
+Cache-Control: public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800
+```
+
+Index, health, and error responses are `no-store`. The reasoning: a catalog is
+compiled into the deployment, so the bytes behind one URL cannot change until
+a new deployment ships — but the URL itself is not versioned, so caches must
+still have a bound. A day of freshness keeps repeat requests off the origin;
+after that the stale copy is served while a background request revalidates, and
+for a week if the origin errors out.
+
+Practical consequences: a merge, or a host migration, can take up to a day to
+reach a warm cache, and a cache holding a fresh entry will not revalidate on
+its own. Vagrant's own requests bypass HTTP caches (it fetches through curl on
+`box add`/`box update`), so this affects browsers and proxies, not `vagrant
+box update` itself. Vagrant does cache outdated checks client-side for an hour,
+so `vagrant box outdated` is not instant either.
