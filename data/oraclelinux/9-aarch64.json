@@ -1,0 +1,19 @@
+{
+  "name": "oraclelinux/9-aarch64",
+  "description": "Oracle Linux 9 (Apple Silicon). Dummy catalog: URLs point at public-yum.oracle.com and the checksums are placeholders.",
+  "versions": [
+    {
+      "version": "9.6",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol9/OL9U6_arm64-vagrant-virtualbox.box",
+          "checksum_type": "sha256",
+          "checksum": "f41d668a50980948dbdebbeca1d65181b0a764bddc54f8f243719cdb6ecfd69e",
+          "architecture": "arm64",
+          "default_architecture": true
+        }
+      ]
+    }
+  ]
+}

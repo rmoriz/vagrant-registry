@@ -1,0 +1,27 @@
+{
+  "name": "oraclelinux/8",
+  "description": "Oracle Linux 8 (x86_64). Dummy catalog: URLs point at public-yum.oracle.com and the checksums are placeholders.",
+  "versions": [
+    {
+      "version": "8.10",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol8/OL8U10_amd64-vagrant-virtualbox.box",
+          "checksum_type": "sha256",
+          "checksum": "d378f6b0c122c8dbcf8206f24ecfb0f7e8065f9ddfc0367ab83641f351fe10b0",
+          "architecture": "amd64",
+          "default_architecture": true
+        },
+        {
+          "name": "libvirt",
+          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol8/OL8U10_amd64-vagrant-libvirt.box",
+          "checksum_type": "sha256",
+          "checksum": "8416867434334b16850a8c4255cc771706553aaafc1972386e0c4fabe9289e5f",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    }
+  ]
+}

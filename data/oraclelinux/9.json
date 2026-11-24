@@ -1,0 +1,27 @@
+{
+  "name": "oraclelinux/9",
+  "description": "Oracle Linux 9 (x86_64). Dummy catalog: URLs point at public-yum.oracle.com and the checksums are placeholders.",
+  "versions": [
+    {
+      "version": "9.6",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol9/OL9U6_amd64-vagrant-virtualbox.box",
+          "checksum_type": "sha256",
+          "checksum": "b07563eb99f19708f0d3abd4f759da9e2fa740a7d06dd80cb4c2562dba0a11f7",
+          "architecture": "amd64",
+          "default_architecture": true
+        },
+        {
+          "name": "libvirt",
+          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol9/OL9U6_amd64-vagrant-libvirt.box",
+          "checksum_type": "sha256",
+          "checksum": "ed12772f83fe2d175ee06536125ff9973fa8365b5653425cf031950e0865ff97",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    }
+  ]
+}

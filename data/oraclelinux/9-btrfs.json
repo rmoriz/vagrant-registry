@@ -1,0 +1,27 @@
+{
+  "name": "oraclelinux/9-btrfs",
+  "description": "Oracle Linux 9 with Btrfs root filesystem (x86_64). Dummy catalog: URLs point at public-yum.oracle.com and the checksums are placeholders.",
+  "versions": [
+    {
+      "version": "9.6",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol9/OL9U6_amd64-vagrant-virtualbox-btrfs.box",
+          "checksum_type": "sha256",
+          "checksum": "b1d9fc200a3cf53cf39de2e2c2828f792712fca84fa33e79a648af90996b1942",
+          "architecture": "amd64",
+          "default_architecture": true
+        },
+        {
+          "name": "libvirt",
+          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol9/OL9U6_amd64-vagrant-libvirt-btrfs.box",
+          "checksum_type": "sha256",
+          "checksum": "59d0a75efc62293491ff46a6d3ad64e1cfb49a0662a2e47627d853cdd3791997",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    }
+  ]
+}

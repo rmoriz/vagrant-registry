@@ -1,0 +1,27 @@
+{
+  "name": "oraclelinux/10",
+  "description": "Oracle Linux 10 (x86_64). Dummy catalog: URLs point at public-yum.oracle.com and the checksums are placeholders.",
+  "versions": [
+    {
+      "version": "10.1",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_amd64-vagrant-virtualbox.box",
+          "checksum_type": "sha256",
+          "checksum": "a02852d3c3543dc28e10470f0209f9a985a93352172eb9dc0d582bf3a2c59a52",
+          "architecture": "amd64",
+          "default_architecture": true
+        },
+        {
+          "name": "libvirt",
+          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_amd64-vagrant-libvirt.box",
+          "checksum_type": "sha256",
+          "checksum": "2dc0e662536fc4fabcec9f1205315efd3ade71ed8970d2b47edffb0a2356cbb9",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    }
+  ]
+}

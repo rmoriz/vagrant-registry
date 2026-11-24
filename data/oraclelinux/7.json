@@ -1,0 +1,27 @@
+{
+  "name": "oraclelinux/7",
+  "description": "Oracle Linux 7 (x86_64). Dummy catalog: URLs point at public-yum.oracle.com and the checksums are placeholders.",
+  "versions": [
+    {
+      "version": "7.9",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_amd64-vagrant-virtualbox.box",
+          "checksum_type": "sha256",
+          "checksum": "4d47138bcb4b01a2de42dfbc21963117849f350f4e1a2794d5f9438f33f5c3bb",
+          "architecture": "amd64",
+          "default_architecture": true
+        },
+        {
+          "name": "libvirt",
+          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol7/OL7U9_amd64-vagrant-libvirt.box",
+          "checksum_type": "sha256",
+          "checksum": "3bb2bc15492e1f57236a8f47d7568baae91d2f9a1e392058e25b5de18eee5391",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    }
+  ]
+}

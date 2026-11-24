@@ -1,0 +1,19 @@
+{
+  "name": "oraclelinux/10-aarch64",
+  "description": "Oracle Linux 10 (Apple Silicon). Dummy catalog: URLs point at public-yum.oracle.com and the checksums are placeholders.",
+  "versions": [
+    {
+      "version": "10.1",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://public-yum.oracle.com/boxes/oraclelinux/ol10/OL10U1_arm64-vagrant-virtualbox.box",
+          "checksum_type": "sha256",
+          "checksum": "e607daec18629ad463610895b71b231cda5171e536568b2bdb40bd136f7e8aeb",
+          "architecture": "arm64",
+          "default_architecture": true
+        }
+      ]
+    }
+  ]
+}
