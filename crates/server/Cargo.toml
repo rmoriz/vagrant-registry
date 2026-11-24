@@ -1,0 +1,21 @@
+[package]
+name = "vagrant-registry-server"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.91"
+license = "MIT"
+
+[dependencies]
+vagrant-registry-core = { path = "../core" }
+axum.workspace = true
+tokio = { workspace = true, features = [
+    "rt-multi-thread",
+    "macros",
+    "net",
+    "signal",
+    "io-util",
+    "time",
+] }
+tower-http = { workspace = true, features = ["trace"] }
+tracing.workspace = true
+tracing-subscriber.workspace = true
