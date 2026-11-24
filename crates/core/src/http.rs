@@ -151,12 +151,16 @@ fn headers_for(body: &Body) -> &'static [(&'static str, &'static str)] {
     }
 }
 
-fn reply(status: u16, body: Body) -> Reply {
+fn reply_with(status: u16, headers: &'static [(&'static str, &'static str)], body: Body) -> Reply {
     Reply {
         status,
-        headers: headers_for(&body),
+        headers,
         body,
     }
+}
+
+fn reply(status: u16, body: Body) -> Reply {
+    reply_with(status, headers_for(&body), body)
 }
 
 fn index_document() -> String {
@@ -184,6 +188,9 @@ fn index_document() -> String {
 pub fn handle(method: &str, raw_path: &str) -> Reply {
     let target = parse_target(request_path(raw_path));
 
+    // The index document is built before the method gate because path
+    // resolution precedes method resolution; a wrong-method request pays for
+    // an index it discards.
     let resolved = match target {
         Target::Index => Some(reply(200, Body::Html(index_document()))),
         Target::Health => Some(reply(200, Body::Text(format!("ok {}\n", CATALOGS.len())))),
@@ -194,11 +201,11 @@ pub fn handle(method: &str, raw_path: &str) -> Reply {
     let mut reply = match resolved {
         None => reply(404, Body::Text(NOT_FOUND.to_string())),
         Some(reply) if method == "GET" || method == "HEAD" => reply,
-        Some(_) => Reply {
-            status: 405,
-            headers: &METHOD_NOT_ALLOWED_HEADERS,
-            body: Body::Text(METHOD_NOT_ALLOWED.to_string()),
-        },
+        Some(_) => reply_with(
+            405,
+            &METHOD_NOT_ALLOWED_HEADERS,
+            Body::Text(METHOD_NOT_ALLOWED.to_string()),
+        ),
     };
 
     if method == "HEAD" {
@@ -498,22 +505,24 @@ mod tests {
     fn index_lists_every_catalog_with_escaped_description_and_count() {
         let body = html(handle("GET", "/"));
 
-        assert!(body.starts_with(
-            "<!doctype html><meta charset=\"utf-8\"><title>Vagrant boxes</title><h1>Vagrant boxes</h1><ul>"
-        ));
-        assert!(body.ends_with("</ul>\n"));
+        let mut entries: Vec<&(&str, &str, usize)> = INDEX.iter().collect();
+        entries.sort_by(|left, right| left.0.cmp(right.0));
 
-        for (name, description, count) in INDEX {
-            assert!(body.contains(name), "{name} missing");
-            assert!(
-                body.contains(&html_escape(description)),
-                "{description} missing"
-            );
-            assert!(
-                body.contains(&format!("({count} versions)")),
-                "{count} missing"
-            );
+        let mut expected = String::from(
+            "<!doctype html><meta charset=\"utf-8\"><title>Vagrant boxes</title><h1>Vagrant boxes</h1><ul>",
+        );
+        for (name, description, count) in entries {
+            expected.push_str(&format!(
+                "<li><a href=\"/{}\">{}</a> — {} ({} versions)</li>",
+                html_escape(name),
+                html_escape(name),
+                html_escape(description),
+                count
+            ));
         }
+        expected.push_str("</ul>\n");
+
+        assert_eq!(body, expected);
     }
 
     #[test]
