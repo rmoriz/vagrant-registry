@@ -1,0 +1,19 @@
+name: CI
+
+# main and staging deploy themselves, so only other refs land here.
+on:
+  pull_request:
+  push:
+    branches-ignore: [main, staging]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: Gate
+    uses: ./.github/workflows/test.yml

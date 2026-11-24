@@ -1,0 +1,33 @@
+{
+  "name": "acme/base",
+  "description": "Acme base image",
+  "versions": [
+    {
+      "version": "1.2.0",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://downloads.example.com/acme-base-1.2.0-vbox-amd64.box",
+          "checksum_type": "sha256",
+          "checksum": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+          "architecture": "amd64",
+          "default_architecture": true
+        },
+        {
+          "name": "virtualbox",
+          "url": "https://downloads.example.com/acme-base-1.2.0-vbox-arm64.box",
+          "checksum_type": "sha256",
+          "checksum": "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+          "architecture": "arm64",
+          "default_architecture": false
+        },
+        {
+          "name": "libvirt",
+          "url": "https://downloads.example.com/acme-base-1.2.0-libvirt.box",
+          "architecture": "amd64",
+          "default_architecture": true
+        }
+      ]
+    }
+  ]
+}

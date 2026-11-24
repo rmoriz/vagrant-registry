@@ -1,0 +1,9 @@
+/target
+/build
+/node_modules
+/.git
+/docs
+/dist
+/.wrangler
+/.superpowers
+.DS_Store

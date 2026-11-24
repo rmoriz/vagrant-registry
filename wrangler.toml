@@ -1,0 +1,15 @@
+name = "vagrant-registry"
+main = "build/index.js"
+compatibility_date = "2026-11-24"
+
+[build]
+command = "sh -c 'cd crates/worker && worker-build --release -d ../../build'"
+
+[observability]
+enabled = true
+
+[env.staging]
+name = "vagrant-registry-staging"
+
+[env.staging.build]
+command = "sh -c 'cd crates/worker && worker-build --release -d ../../build'"
