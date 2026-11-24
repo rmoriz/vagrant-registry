@@ -22,7 +22,7 @@ static TEXT_HEADERS: [(&str, &str); 3] = [
     ("cache-control", "no-store"),
 ];
 // Body::Empty is never produced by `handle`: HEAD empties the body only after
-// the header table is chosen. The table exists for adapters and tests.
+// the header table is chosen, so only `headers_for` (via tests) reaches this.
 static EMPTY_HEADERS: [(&str, &str); 2] = [
     ("x-content-type-options", "nosniff"),
     ("cache-control", "no-store"),

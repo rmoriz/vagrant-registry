@@ -12,7 +12,7 @@ No box binary hosting, proxying, or Vagrant Cloud feature parity.
 > documents are strict JSON under `data/` (not YAML under `boxes/`), there is
 > no admin API, no admin UI, and no `REGISTRY_ADMIN_TOKEN`, and the
 > `/catalogs/{org}/{box}.json` route exists on every deployment. §2 (what
-> Vagrant calls), §2.3 (catalog JSON) and §4.1 (validation) remain binding as
+> Vagrant calls) and §4 (model, validation and rendering) remain binding as
 > written; §3, §5 and the admin parts of §6 are history.
 
 ## 1. Intent
