@@ -56,6 +56,7 @@ same JSON contract through an API.
 ```text
 .
 ├── README.md
+├── LICENSE
 ├── docs/
 │   ├── superpowers/
 │   │   ├── specs/2026-11-13-vagrant-registry-design.md
@@ -67,3 +68,7 @@ same JSON contract through an API.
 │   └── ... deployment runbooks created by the chosen plan
 └── (application files created by the chosen plan)
 ```
+
+## License
+
+MIT — see [LICENSE](LICENSE). Copyright (c) 2026 Roland Moriz.
