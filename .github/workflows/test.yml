@@ -1,0 +1,187 @@
+name: Test
+
+# The reusable gate: deploys call this workflow so they run the same checks.
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Format, lint, test, and build WASM
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.91"
+          targets: wasm32-unknown-unknown
+          components: rustfmt, clippy
+
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      # The worker crate only compiles for wasm32, so it is left out of the
+      # host clippy and test steps below.
+      - name: Lint host crates
+        run: cargo clippy -p vagrant-registry-core -p vagrant-registry-server --all-targets -- -D warnings
+
+      - name: Lint the worker for wasm32
+        run: cargo clippy -p vagrant-registry-worker --target wasm32-unknown-unknown -- -D warnings
+
+      - name: Test host crates
+        run: cargo test -p vagrant-registry-core -p vagrant-registry-server
+
+      - name: Check the worker for wasm32
+        run: cargo check -p vagrant-registry-worker --target wasm32-unknown-unknown
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Install worker-build
+        run: cargo install worker-build --version 0.9.0 --locked
+
+      - name: Build the worker bundle
+        run: npx wrangler deploy --dry-run --outdir dist
+
+  build-gate:
+    name: Catalog name must match its path
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.91"
+
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Copy a catalog under a foreign name
+        run: |
+          mkdir -p data/gate
+          cp data/acme/base.json data/gate/gate.json
+
+      # `pipefail` is explicit so the pipeline status is cargo's, not tee's.
+      # A passing build here is a failure: the name/path mismatch must be caught.
+      - name: Broken name must fail
+        shell: bash
+        run: |
+          set -uo pipefail
+          if cargo build -p vagrant-registry-core 2>&1 | tee gate.log; then
+            echo "::error::the build passed although data/gate/gate.json is named acme/base"
+            exit 1
+          fi
+          if ! grep -qF 'data/gate/gate.json: name:' gate.log; then
+            echo "::error::the failure did not name data/gate/gate.json: name:"
+            exit 1
+          fi
+
+      - name: Fix the name
+        run: |
+          sed -i 's/"name": *"acme\/base"/"name": "gate\/gate"/' data/gate/gate.json
+
+      - name: Matching name must pass
+        run: cargo build -p vagrant-registry-core
+
+      - name: Clean up
+        if: always()
+        run: rm -rf data/gate gate.log
+
+  smoke-worker:
+    name: Smoke the worker adapter
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.91"
+
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Install worker-build
+        run: cargo install worker-build --version 0.9.0 --locked
+
+      - name: Start the worker
+        run: |
+          npx wrangler dev --port 8787 >wrangler.log 2>&1 &
+          echo "pid=$!" >> "$GITHUB_ENV"
+
+      - name: Wait for health
+        shell: bash
+        run: |
+          for _ in $(seq 1 60); do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8787/healthz || true)
+            if [ "$code" = 200 ]; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::the worker did not become healthy"
+          exit 1
+
+      - name: Smoke the worker
+        run: ./scripts/smoke.sh http://127.0.0.1:8787
+
+      - name: Stop the worker and show its log
+        if: always()
+        run: |
+          kill "$pid" || true
+          cat wrangler.log
+
+  smoke-container:
+    name: Smoke the container adapter
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Show the Docker version
+        run: docker version
+
+      - name: Smoke the container
+        run: ./scripts/container_smoke.sh
+
+      - name: Remove leftover containers
+        if: always()
+        run: docker ps -a --filter name=vagrant-registry-smoke --format '{{.Names}}' | xargs -r docker rm -f
