@@ -6,3 +6,5 @@
 /dist
 *.db*
 .DS_Store
+# Superpowers process record: ledgers, briefs, review packages. Local only.
+/.superpowers/
