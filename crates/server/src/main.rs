@@ -42,7 +42,7 @@ fn handle_reply(reply: Reply) -> Response {
 
     for (name, value) in reply.headers {
         if let Ok(value) = HeaderValue::from_str(value) {
-            response.headers_mut().insert(*name, value);
+            response.headers_mut().append(*name, value);
         }
     }
 
@@ -55,7 +55,13 @@ async fn handler(method: Method, OriginalUri(uri): OriginalUri) -> Response {
 
 #[tokio::main]
 async fn main() -> ExitCode {
-    let port = port();
+    let port = match port() {
+        Ok(port) => port,
+        Err(error) => {
+            eprintln!("{error}");
+            return ExitCode::FAILURE;
+        }
+    };
 
     if std::env::args()
         .skip(1)
@@ -65,7 +71,7 @@ async fn main() -> ExitCode {
     }
 
     tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::INFO)
+        .with_max_level(tracing::Level::DEBUG)
         .init();
 
     let app = Router::new()
@@ -93,15 +99,13 @@ async fn main() -> ExitCode {
     ExitCode::SUCCESS
 }
 
-fn port() -> u16 {
+fn port() -> Result<u16, String> {
     let Ok(raw) = std::env::var("PORT") else {
-        return DEFAULT_PORT;
+        return Ok(DEFAULT_PORT);
     };
 
-    raw.parse().unwrap_or_else(|_| {
-        eprintln!("PORT {raw:?} is not a port, using {DEFAULT_PORT}");
-        DEFAULT_PORT
-    })
+    raw.parse()
+        .map_err(|_| format!("PORT {raw:?} is not a port"))
 }
 
 /// Probes `/healthz` over loopback and succeeds only on a `200` status line.
@@ -181,7 +185,7 @@ mod tests {
     use axum::body::to_bytes;
     use axum::http::header::{CONTENT_LENGTH, CONTENT_TYPE};
     use axum::http::{HeaderValue, StatusCode, Uri};
-    use vagrant_registry_core::http::{Body, Reply};
+    use vagrant_registry_core::http::{Body, Reply, request_path};
 
     static JSON_ONLY: [(&str, &str); 1] = [("content-type", "application/json")];
 
@@ -234,8 +238,8 @@ mod tests {
 
     #[test]
     fn path_of_drops_the_query_and_keeps_percent_encoding() {
-        let uri: Uri = "/acme/base?x=1".parse().expect("valid uri");
-        assert_eq!(path_of(&uri), "/acme/base");
+        assert_eq!(request_path("/acme/base?x=1"), "/acme/base");
+        assert_eq!(request_path("/acme/base#frag?x=1"), "/acme/base");
 
         let encoded: Uri = "/acme%2Fbase".parse().expect("valid uri");
         assert_eq!(path_of(&encoded), "/acme%2Fbase");
